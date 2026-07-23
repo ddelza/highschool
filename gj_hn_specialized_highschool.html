@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>경기·하남권 특성화고 학교정보 모음</title>
+<style>
+  :root{
+    --navy:#1c2b4a;
+    --blue:#2f5fa8;
+    --line:#dfe4ea;
+    --bg:#f5f7fa;
+    --card:#ffffff;
+    --muted:#6b7684;
+    --accent:#e8641c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;
+    background:var(--bg);
+    color:#222;
+  }
+  header.site{
+    background:var(--navy);
+    color:#fff;
+    padding:28px 20px 22px;
+    text-align:center;
+  }
+  header.site h1{margin:0 0 6px;font-size:1.5rem;}
+  header.site p{margin:0;color:#c8d2e6;font-size:0.9rem;}
+
+  .search-wrap{
+    max-width:720px;
+    margin:22px auto 0;
+    padding:0 20px;
+  }
+  .search-box{
+    display:flex;
+    gap:8px;
+    background:var(--card);
+    border:2px solid var(--blue);
+    border-radius:10px;
+    padding:10px 14px;
+  }
+  .search-box input{
+    flex:1;
+    border:none;
+    outline:none;
+    font-size:1rem;
+    background:transparent;
+  }
+  .search-box .hint{color:var(--muted);font-size:0.8rem;margin-top:6px;text-align:center;}
+  .search-results{
+    margin-top:10px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    display:none;
+  }
+  .search-results.show{display:block;}
+  .search-results .result-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 16px;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+  }
+  .search-results .result-item:last-child{border-bottom:none;}
+  .search-results .result-item:hover{background:#eef3fb;}
+  .result-item .dept{font-weight:bold;color:var(--blue);}
+  .result-item .school{color:var(--muted);font-size:0.85rem;}
+  .result-empty{padding:14px 16px;color:var(--muted);font-size:0.9rem;}
+
+  nav.school-nav{
+    max-width:1100px;
+    margin:26px auto 0;
+    padding:0 20px;
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+    gap:10px;
+  }
+  nav.school-nav a{
+    display:block;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:4px solid var(--blue);
+    border-radius:8px;
+    padding:10px 12px;
+    text-decoration:none;
+    color:var(--navy);
+    font-size:0.88rem;
+    font-weight:bold;
+    transition:box-shadow .15s;
+  }
+  nav.school-nav a:hover{box-shadow:0 2px 8px rgba(0,0,0,.12);}
+
+  main{
+    max-width:1100px;
+    margin:0 auto;
+    padding:30px 20px 60px;
+  }
+
+  .school-page{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:26px 30px;
+    margin-bottom:28px;
+    scroll-margin-top:16px;
+  }
+  .school-page.flash{animation:flash 1.4s ease;}
+  @keyframes flash{
+    0%{box-shadow:0 0 0 4px rgba(232,100,28,.6);}
+    100%{box-shadow:0 0 0 0 rgba(232,100,28,0);}
+  }
+
+  .school-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    border-bottom:2px solid var(--navy);
+    padding-bottom:10px;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .school-head h2{margin:0;font-size:1.3rem;color:var(--navy);}
+  .school-head .en{display:block;font-size:0.82rem;color:var(--muted);font-weight:normal;margin-top:2px;}
+  .badge{
+    display:inline-block;
+    background:var(--blue);
+    color:#fff;
+    font-size:0.75rem;
+    padding:4px 10px;
+    border-radius:20px;
+    white-space:nowrap;
+  }
+
+  .info-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px 24px;
+    margin-bottom:16px;
+  }
+  .info-block dt{font-size:0.75rem;color:var(--muted);margin-bottom:2px;}
+  .info-block dd{margin:0;font-size:0.92rem;}
+  .info-block.full{grid-column:1 / -1;}
+  .info-block a{color:var(--blue);text-decoration:none;}
+
+  h3.section-title{
+    font-size:0.95rem;
+    color:var(--navy);
+    border-left:4px solid var(--accent);
+    padding-left:8px;
+    margin:18px 0 8px;
+  }
+
+  table.dept-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.85rem;
+  }
+  table.dept-table th,table.dept-table td{
+    border:1px solid var(--line);
+    padding:6px 8px;
+    text-align:center;
+  }
+  table.dept-table thead th{background:#eef2f7;color:var(--navy);}
+  table.dept-table td.dept-name{text-align:left;font-weight:bold;color:var(--navy);}
+  table.dept-table tfoot td{font-weight:bold;background:#f8fafc;}
+
+  .staff-row{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin-top:14px;
+  }
+  .staff-cell{
+    background:#f8fafc;
+    border:1px solid var(--line);
+    border-radius:8px;
+    text-align:center;
+    padding:8px 4px;
+  }
+  .staff-cell .num{font-size:1.15rem;font-weight:bold;color:var(--navy);}
+  .staff-cell .lbl{font-size:0.72rem;color:var(--muted);}
+
+  .keywords{margin-top:4px;font-size:0.72rem;color:var(--muted);}
+  .keywords span{
+    display:inline-block;
+    background:#eef2f7;
+    border-radius:10px;
+    padding:1px 8px;
+    margin:2px 3px 0 0;
+  }
+
+  footer.site{
+    text-align:center;
+    color:var(--muted);
+    font-size:0.8rem;
+    padding:20px;
+  }
+
+  @media print{
+    header.site, .search-wrap, nav.school-nav, footer.site{display:none;}
+    body{background:#fff;}
+    main{padding:0;max-width:none;}
+    .school-page{
+      border:none;
+      border-radius:0;
+      box-shadow:none;
+      page-break-after:always;
+      margin:0;
+      padding:14mm 12mm;
+    }
+    .school-page:last-child{page-break-after:auto;}
+  }
+  @page{size:A4;margin:10mm;}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <h1>경기·하남권 특성화고 학교정보 모음</h1>
+  <p>하이파이브(HIFIVE) 특성화고·마이스터고 포털 기준 정보 · 학교당 1장 인쇄용</p>
+</header>
+
+<div class="search-wrap">
+  <div class="search-box">
+    <input type="text" id="deptSearch" placeholder="학과 키워드로 검색 (예: 디자인, 간호, 항공, AI, 조리...)">
+  </div>
+  <div class="hint">학과명이나 관련 키워드를 입력하면 해당 학과가 있는 학교가 표시됩니다.</div>
+  <div class="search-results" id="searchResults"></div>
+</div>
+
+<nav class="school-nav" id="schoolNav"></nav>
+
+<main id="mainContent"></main>
+
+<footer class="site">
+  자료 출처: <a href="https://www.hifive.go.kr" target="_blank" rel="noopener">hifive.go.kr</a> (특성화고·마이스터고 포털, 교육부) · 학교별 최신 학교알리미 정보 확인 권장
+</footer>
+
+<script>
+const schools = [
+  {
+    id:"gyeonggi-tourism",
+    name:"경기관광고등학교",
+    nameEn:"Gyeonggi Tourism High School",
+    type:"사립 남녀공학 특성화고",
+    address:"[12610] 경기도 여주시 대신면 여양로 1416 경기관광고등학교",
+    office:"031-882-9196",
+    admin:"031-882-2250",
+    job:"031-8051-2638",
+    fax:"070-7166-8874",
+    homepage:"http://gtour.hs.kr",
+    departments:[
+      {name:"호텔조리과", grades:[[1,21],[1,22],[1,22]], keywords:["조리","요리","호텔","외식","제과제빵"]},
+      {name:"카페베이커리과", grades:[[1,23],[1,23],[1,22]], keywords:["카페","베이커리","제과","제빵","바리스타"]},
+      {name:"항공호텔서비스과", grades:[[1,19],[1,24],[1,21]], keywords:["항공","승무원","호텔","서비스","관광"]},
+      {name:"크리에이트창업과", grades:[[1,21],[1,19],[0,0]], keywords:["창업","크리에이터","콘텐츠"]},
+      {name:"관광경영과", grades:[[0,0],[0,0],[1,22]], keywords:["관광","경영","여행"]}
+    ],
+    staff:{general:10, expert:14, other:5, admin:11}
+  },
+  {
+    id:"gyeongbuk-aviation",
+    name:"경북항공고등학교",
+    nameEn:"Gyeongbuk Aviation High School",
+    type:"사립 남녀공학 특성화고",
+    address:"[36023] 경상북도 영주시 풍기읍 금계로 90 경북항공고등학교",
+    office:"054-636-2702",
+    admin:"054-636-2701",
+    job:"054-636-2702",
+    fax:"054-636-2704",
+    homepage:"http://school.gyo6.net/gag/main.do",
+    departments:[
+      {name:"항공정비과", grades:[[2,53],[2,49],[2,51]], keywords:["항공","정비","드론","기계"]},
+      {name:"항공전자과", grades:[[2,52],[2,48],[2,48]], keywords:["항공","전자","전기"]}
+    ],
+    staff:{general:11, expert:11, other:9, admin:24}
+  },
+  {
+    id:"kyunghwa-eb",
+    name:"경화여자English Business고등학교 (경화여자EB고등학교)",
+    nameEn:"Kyunghwa Girls' English Business High School",
+    type:"사립 여 특성화고",
+    address:"[464901] 경기도 광주시 송정동 수하길11번길 43",
+    office:"031-799-0604",
+    admin:"031-799-0691",
+    job:"031-799-0608",
+    fax:"031-799-0641",
+    homepage:"http://kheb-h.goegh.kr",
+    departments:[
+      {name:"공공행정사무", grades:[[2,49],[2,47],[2,41]], keywords:["행정","공무원","사무","공공"]},
+      {name:"창업마케팅", grades:[[1,24],[1,24],[1,21]], keywords:["창업","마케팅","비즈니스"]},
+      {name:"비즈니스영어", grades:[[2,48],[2,45],[2,43]], keywords:["영어","비즈니스","외국어","무역"]}
+    ],
+    staff:{general:16, expert:15, other:4, admin:8}
+  },
+  {
+    id:"bundang-management",
+    name:"분당경영고등학교",
+    nameEn:"Bundang Management High School",
+    type:"공립 남녀공학 특성화고",
+    address:"[463804] 경기도 성남시 분당구 금곡동 금곡로 289 분당경영고등학교",
+    office:"031-8023-1305",
+    admin:"031-8023-1403",
+    job:"031-8023-1430",
+    fax:"031-8023-1495",
+    homepage:"http://bundangmgt-h.goesn.kr",
+    departments:[
+      {name:"그래픽디자인과", grades:[[2,43],[2,35],[2,39]], keywords:["디자인","그래픽","시각디자인"]},
+      {name:"IT소프트웨어과", grades:[[2,27],[1,11],[2,21]], keywords:["IT","소프트웨어","프로그래밍","컴퓨터","코딩"]},
+      {name:"회계금융과", grades:[[2,42],[2,33],[2,35]], keywords:["회계","금융","세무","경영"]},
+      {name:"스마트호텔관광", grades:[[2,44],[2,36],[2,34]], keywords:["호텔","관광","서비스"]},
+      {name:"스마트경영과", grades:[[1,17],[1,14],[1,7]], keywords:["경영","비즈니스","창업"]}
+    ],
+    staff:{general:0, expert:0, other:0, admin:0}
+  },
+  {
+    id:"sangil-media",
+    name:"상일미디어고등학교",
+    nameEn:"Sangil Media High School",
+    type:"사립 남녀공학 특성화고",
+    address:"[134837] 서울 강동구 상일동 천호대로219길 61",
+    office:"02-428-0732",
+    admin:"02-428-0732(334)",
+    job:"02-428-0732(320)",
+    fax:"02-3427-0733",
+    homepage:"http://sangilmedia.sen.hs.kr",
+    departments:[
+      {name:"바이오푸드", grades:[[2,36],[2,36],[2,36]], keywords:["바이오","푸드","식품","화학"]},
+      {name:"디지털미디어디자인", grades:[[2,27],[2,28],[2,35]], keywords:["디자인","미디어","영상","디지털"]},
+      {name:"디지털만화영상", grades:[[2,40],[2,39],[2,39]], keywords:["만화","웹툰","영상","애니메이션"]},
+      {name:"인공지능소프트웨어", grades:[[2,23],[2,22],[3,35]], keywords:["AI","인공지능","소프트웨어","프로그래밍","코딩"]},
+      {name:"사물인터넷", grades:[[2,25],[1,10],[2,22]], keywords:["IoT","사물인터넷","전자","코딩"]}
+    ],
+    staff:{general:11, expert:28, other:30, admin:30}
+  },
+  {
+    id:"seongdong-technical",
+    name:"성동공업고등학교",
+    nameEn:"Seongdong Technical High School",
+    type:"공립 남녀공학 특성화고",
+    address:"[100878] 서울 중구 흥인동 1-1 (다산로 290)",
+    office:"02-6263-8202",
+    admin:"070-8685-7702",
+    job:"02-6263-8212",
+    fax:"02-2237-0814",
+    homepage:"http://sdth.sen.hs.kr",
+    departments:[
+      {name:"전자과", grades:[[0,0],[1,0],[1,12]], keywords:["전자","전기","공업"]},
+      {name:"전기과", grades:[[0,0],[2,0],[2,37]], keywords:["전기","전자","공업"]},
+      {name:"건축토목과", grades:[[0,0],[0,0],[1,14]], keywords:["건축","토목","설계"]},
+      {name:"스마트팩토리과", grades:[[0,0],[0,0],[1,4]], keywords:["스마트팩토리","자동화","공장","기계"]},
+      {name:"패션주얼리디자인과", grades:[[1,0],[1,0],[1,14]], keywords:["패션","주얼리","디자인"]},
+      {name:"소방안전기계", grades:[[2,0],[2,0],[2,27]], keywords:["소방","안전","기계"]},
+      {name:"소방시설관리", grades:[[2,0],[2,0],[1,20]], keywords:["소방","시설관리","안전"]},
+      {name:"도시건축디자인", grades:[[1,0],[1,0],[1,16]], keywords:["건축","도시","디자인"]},
+      {name:"소방전기과", grades:[[2,40],[0,0],[0,0]], keywords:["소방","전기","안전"]},
+      {name:"소방모빌리티과", grades:[[1,20],[0,0],[0,0]], keywords:["소방","모빌리티","자동차"]}
+    ],
+    staff:{general:24, expert:41, other:6, admin:24}
+  },
+  {
+    id:"seongbo-management",
+    name:"성보경영고등학교",
+    nameEn:"Seong Bo Management High School",
+    type:"사립 남녀공학 특성화고",
+    address:"[13132] 경기도 성남시 수정구 논골로 82 (단대동 5)",
+    office:"031-746-7041",
+    admin:"031-742-7714",
+    job:"031-742-7715",
+    fax:"031-742-7750",
+    homepage:"http://seongbo-h.goesn.kr",
+    departments:[
+      {name:"보건간호과", grades:[[2,42],[2,40],[2,40]], keywords:["간호","보건","의료","헬스케어"]},
+      {name:"외식조리경영과", grades:[[2,42],[2,36],[2,34]], keywords:["외식","조리","경영","요리"]},
+      {name:"관광레저경영과", grades:[[2,48],[2,36],[2,43]], keywords:["관광","레저","경영"]},
+      {name:"세무행정과", grades:[[0,0],[0,0],[2,31]], keywords:["세무","행정","회계"]},
+      {name:"펫매니지먼트과", grades:[[1,21],[1,20],[1,18]], keywords:["펫","동물","반려동물"]},
+      {name:"디지털비즈니스과", grades:[[2,40],[2,19],[0,0]], keywords:["디지털","비즈니스","IT"]},
+      {name:"비주얼디자인과", grades:[[2,42],[2,34],[2,45]], keywords:["디자인","비주얼","시각디자인"]},
+      {name:"제과제빵과", grades:[[1,21],[1,21],[1,19]], keywords:["제과","제빵","베이커리"]}
+    ],
+    staff:{general:44, expert:42, other:8, admin:30}
+  },
+  {
+    id:"sungil-info",
+    name:"성일정보고등학교",
+    nameEn:"Sungil Information High School",
+    type:"사립 남녀공학 특성화고",
+    address:"[462826] 경기도 성남시 중원구 성남동 시민로77번길 성일정보고등학교",
+    office:"031-720-1303",
+    admin:"031-720-1333",
+    job:"031-720-1392",
+    fax:"031-720-1379",
+    homepage:"http://sungili-h.goesn.kr/sungili-h/main.do",
+    departments:[
+      {name:"글로벌경영과", grades:[[2,42],[0,0],[0,0]], keywords:["경영","글로벌","비즈니스"]},
+      {name:"뷰티디자인과", grades:[[1,22],[1,17],[1,18]], keywords:["뷰티","디자인","미용"]},
+      {name:"부사관과", grades:[[1,22],[1,20],[1,21]], keywords:["부사관","군인","군사"]},
+      {name:"금융경영과", grades:[[0,0],[2,0],[2,35]], keywords:["금융","경영","회계"]},
+      {name:"회계정보과", grades:[[2,0],[2,0],[2,45]], keywords:["회계","정보","세무"]},
+      {name:"창업마케팅과", grades:[[2,42],[2,28],[2,37]], keywords:["창업","마케팅"]},
+      {name:"스마트웹콘텐츠과", grades:[[0,0],[0,0],[2,37]], keywords:["웹","콘텐츠","IT"]},
+      {name:"소프트웨어개발과", grades:[[2,0],[2,0],[2,44]], keywords:["소프트웨어","개발","프로그래밍","코딩"]},
+      {name:"AI게임콘텐츠학과", grades:[[2,42],[2,39],[0,0]], keywords:["AI","게임","콘텐츠","인공지능"]}
+    ],
+    staff:{general:24, expert:24, other:33, admin:9}
+  },
+  {
+    id:"hanam-management",
+    name:"하남경영고등학교",
+    nameEn:"Hanam Management High School",
+    type:"공립 남녀공학 특성화고",
+    address:"[12955] 경기도 하남시 대청로116번길 11 (창우동)",
+    office:"031-795-6303~4",
+    admin:"031-795-6306",
+    job:"070-7858-5560",
+    fax:"031-796-0107",
+    homepage:"http://hanambiz-h.goegh.kr",
+    departments:[
+      {name:"보건간호과", grades:[[2,0],[2,39],[2,24]], keywords:["간호","보건","의료","헬스케어"]},
+      {name:"서비스디자인과", grades:[[0,0],[1,0],[2,26]], keywords:["디자인","서비스","UX","기획"]},
+      {name:"스마트IT과", grades:[[1,0],[1,0],[2,35]], keywords:["IT","컴퓨터","소프트웨어","프로그래밍","정보기술"]},
+      {name:"콘텐츠디자인", grades:[[1,24],[0,0],[0,0]], keywords:["콘텐츠","디자인","영상","미디어"]},
+      {name:"스마트경영과", grades:[[2,0],[1,0],[2,19]], keywords:["경영","비즈니스","마케팅","창업"]},
+      {name:"카페플랫폼경영과", grades:[[2,0],[2,0],[2,27]], keywords:["카페","바리스타","외식","플랫폼","창업"]}
+    ],
+    staff:{general:27, expert:36, other:0, admin:20}
+  },
+  {
+    id:"korea-kpop",
+    name:"한국K-POP고등학교",
+    nameEn:"Korea K-POP High School",
+    type:"사립 남녀공학 특성화고",
+    address:"[32291] 충청남도 홍성군 광천읍 광천로373번길 14 한국 K-POP고등학교",
+    office:"041-641-6433",
+    admin:"041-641-6434",
+    job:"041-641-6433",
+    fax:"041-641-6430",
+    homepage:"http://k-pophs.cnehs.kr",
+    departments:[
+      {name:"K-POP공연예술과", grades:[[2,35],[2,35],[2,37]], keywords:["K-POP","보컬","댄스","공연","예술","실용음악","랩"]}
+    ],
+    staff:{general:16, expert:0, other:27, admin:9}
+  },
+  {
+    id:"korea-animation",
+    name:"한국애니메이션고등학교",
+    nameEn:"Korea Animation High School",
+    type:"공립 남녀공학 특성화고",
+    address:"[13023] 경기도 하남시 검단산로 223 한국애니메이션고등학교",
+    office:"031-790-9041",
+    admin:"031-790-9005",
+    job:"031-790-9032~9034",
+    fax:"031-791-0548",
+    homepage:"http://anigo-h.goegh.kr/anigo-h/main.do",
+    departments:[
+      {name:"영상연출과", grades:[[1,24],[1,23],[1,21]], keywords:["영상","연출","방송"]},
+      {name:"애니메이션과", grades:[[1,24],[1,24],[1,25]], keywords:["애니메이션","만화"]},
+      {name:"컴퓨터게임제작과", grades:[[1,24],[1,23],[1,21]], keywords:["게임","컴퓨터","제작"]},
+      {name:"만화창작과", grades:[[1,25],[1,24],[1,26]], keywords:["만화","웹툰","창작"]}
+    ],
+    staff:{general:13, expert:16, other:6, admin:20}
+  },
+  {
+    id:"hanlim-design",
+    name:"한림디자인고등학교",
+    nameEn:"Hanlim Art and Design High School",
+    type:"사립 여 특성화고",
+    address:"[380950] 충청북도 충주시 교현동 야현1길 (교현1동 490번지)",
+    office:"043-841-2212",
+    admin:"043-841-2206",
+    job:"043-841-2261",
+    fax:"043-841-2299",
+    homepage:"http://had.hs.kr",
+    departments:[
+      {name:"경영회계", grades:[[1,0],[1,19],[1,19]], keywords:["경영","회계"]},
+      {name:"시각디자인", grades:[[2,0],[2,20],[2,38]], keywords:["디자인","시각디자인","그래픽"]},
+      {name:"조형디자인", grades:[[2,0],[2,0],[2,33]], keywords:["디자인","조형","미술"]},
+      {name:"패션디자인", grades:[[1,21],[1,0],[1,18]], keywords:["패션","디자인","의상"]},
+      {name:"뷰티디자인", grades:[[2,0],[2,0],[2,38]], keywords:["뷰티","디자인","미용"]}
+    ],
+    staff:{general:24, expert:22, other:3, admin:18}
+  },
+  {
+    id:"gwangju-jungang",
+    name:"광주중앙고등학교",
+    nameEn:"Gwangju Joongang High School",
+    type:"공립 남녀공학 일반고(종합고)",
+    address:"[464807] 경기도 광주시 역동 역동로63번길 1 광주중앙고등학교",
+    office:"031-799-7443",
+    admin:"031-799-7306",
+    job:"031-799-7365",
+    fax:"031-799-7383",
+    homepage:"http://gjja-h.goegh.kr",
+    departments:[
+      {name:"산업기계과", grades:[[1,24],[1,25],[1,20]], keywords:["기계","산업","공업"]},
+      {name:"식품가공과", grades:[[1,24],[1,25],[1,26]], keywords:["식품","가공","제조"]},
+      {name:"조경과", grades:[[1,24],[1,24],[1,20]], keywords:["조경","원예","환경"]},
+      {name:"농업유통정보과", grades:[[1,25],[1,23],[1,23]], keywords:["농업","유통","정보"]}
+    ],
+    staff:{general:75, expert:17, other:0, admin:32}
+  }
+];
+
+function sumDept(d){
+  const cls = d.grades.reduce((a,g)=>a+g[0],0);
+  const stu = d.grades.reduce((a,g)=>a+g[1],0);
+  return {cls, stu};
+}
+
+function renderSchoolPage(s){
+  const totalCls = s.departments.reduce((a,d)=>a+sumDept(d).cls,0);
+  const totalStu = s.departments.reduce((a,d)=>a+sumDept(d).stu,0);
+
+  const rows = s.departments.map(d=>{
+    const tot = sumDept(d);
+    return `<tr>
+      <td class="dept-name">${d.name}</td>
+      <td>${d.grades[0][0]}</td><td>${d.grades[0][1]}</td>
+      <td>${d.grades[1][0]}</td><td>${d.grades[1][1]}</td>
+      <td>${d.grades[2][0]}</td><td>${d.grades[2][1]}</td>
+      <td>${tot.cls}</td><td>${tot.stu}</td>
+    </tr>`;
+  }).join("");
+
+  const kw = [...new Set(s.departments.flatMap(d=>d.keywords))];
+
+  return `
+  <section class="school-page" id="${s.id}">
+    <div class="school-head">
+      <h2>${s.name}<span class="en">${s.nameEn}</span></h2>
+      <span class="badge">${s.type}</span>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-block full"><dt>학교 주소</dt><dd>${s.address}</dd></div>
+      <div class="info-block"><dt>교무실 전화번호</dt><dd>${s.office}</dd></div>
+      <div class="info-block"><dt>행정실 전화번호</dt><dd>${s.admin}</dd></div>
+      <div class="info-block"><dt>취업부</dt><dd>${s.job}</dd></div>
+      <div class="info-block"><dt>FAX</dt><dd>${s.fax}</dd></div>
+      <div class="info-block full"><dt>홈페이지 주소</dt><dd><a href="${s.homepage}" target="_blank" rel="noopener">${s.homepage}</a></dd></div>
+    </div>
+
+    <h3 class="section-title">학교현황 (학과별 학급/학생수)</h3>
+    <table class="dept-table">
+      <thead>
+        <tr>
+          <th rowspan="2">학과</th>
+          <th colspan="2">1학년</th><th colspan="2">2학년</th><th colspan="2">3학년</th>
+          <th colspan="2">합계</th>
+        </tr>
+        <tr>
+          <th>학급</th><th>학생</th><th>학급</th><th>학생</th><th>학급</th><th>학생</th><th>학급</th><th>학생</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+      <tfoot>
+        <tr><td>전체</td><td colspan="6"></td><td>${totalCls}</td><td>${totalStu}</td></tr>
+      </tfoot>
+    </table>
+
+    <div class="staff-row">
+      <div class="staff-cell"><div class="num">${s.staff.general}명</div><div class="lbl">일반 교원수</div></div>
+      <div class="staff-cell"><div class="num">${s.staff.expert}명</div><div class="lbl">전문 교원수</div></div>
+      <div class="staff-cell"><div class="num">${s.staff.other}명</div><div class="lbl">기타 교원수</div></div>
+      <div class="staff-cell"><div class="num">${s.staff.admin}명</div><div class="lbl">직원수</div></div>
+    </div>
+
+    <div class="keywords">학과 키워드: ${kw.map(k=>`<span>${k}</span>`).join("")}</div>
+  </section>`;
+}
+
+document.getElementById("mainContent").innerHTML = schools.map(renderSchoolPage).join("");
+document.getElementById("schoolNav").innerHTML = schools.map(s=>`<a href="#${s.id}" data-target="${s.id}">${s.name.split(" (")[0]}</a>`).join("");
+
+// nav click -> smooth scroll + flash
+document.getElementById("schoolNav").addEventListener("click", e=>{
+  const a = e.target.closest("a");
+  if(!a) return;
+  e.preventDefault();
+  goToSchool(a.dataset.target);
+});
+
+function goToSchool(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.scrollIntoView({behavior:"smooth", block:"start"});
+  el.classList.remove("flash");
+  requestAnimationFrame(()=>el.classList.add("flash"));
+}
+
+// department keyword search
+const searchInput = document.getElementById("deptSearch");
+const resultsBox = document.getElementById("searchResults");
+
+function buildIndex(){
+  const idx = [];
+  schools.forEach(s=>{
+    s.departments.forEach(d=>{
+      idx.push({school:s, dept:d});
+    });
+  });
+  return idx;
+}
+const searchIndex = buildIndex();
+
+function runSearch(q){
+  q = q.trim().toLowerCase();
+  if(!q){
+    resultsBox.classList.remove("show");
+    resultsBox.innerHTML = "";
+    return;
+  }
+  const matches = searchIndex.filter(({dept})=>{
+    if(dept.name.toLowerCase().includes(q)) return true;
+    return dept.keywords.some(k=>k.toLowerCase().includes(q) || q.includes(k.toLowerCase()));
+  });
+
+  resultsBox.classList.add("show");
+  if(matches.length===0){
+    resultsBox.innerHTML = `<div class="result-empty">"${q}" 관련 학과를 찾을 수 없습니다.</div>`;
+    return;
+  }
+  resultsBox.innerHTML = matches.map(({school,dept})=>`
+    <div class="result-item" data-target="${school.id}">
+      <span class="dept">${dept.name}</span>
+      <span class="school">${school.name.split(" (")[0]} &rsaquo;</span>
+    </div>`).join("");
+}
+
+searchInput.addEventListener("input", ()=>runSearch(searchInput.value));
+resultsBox.addEventListener("click", e=>{
+  const item = e.target.closest(".result-item");
+  if(!item) return;
+  goToSchool(item.dataset.target);
+});
+</script>
+</body>
+</html>
